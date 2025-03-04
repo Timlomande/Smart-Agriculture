@@ -1,0 +1,65 @@
+import serial
+import time
+import csv
+from datetime import datetime
+import matplotlib.pyplot as plt
+
+# Configure serial port
+ser = serial.Serial('COM3', 9600)  # Update COM port as needed
+time.sleep(2)  # Allow serial connection to initialize
+
+# Create CSV file for data logging
+with open('agriculture_data.csv', 'a', newline='') as f:
+    writer = csv.writer(f)
+    writer.writerow(['Timestamp', 'Temperature', 'Humidity', 'Soil Moisture'])
+
+# Initialize plot
+plt.ion()
+fig = plt.figure()
+ax = fig.add_subplot(111)
+x, temp, humidity, soil = [], [], [], []
+
+def update_plot():
+    ax.clear()
+    ax.plot(x, temp, label='Temperature (°C)')
+    ax.plot(x, humidity, label='Humidity (%)')
+    ax.plot(x, soil, label='Soil Moisture')
+    ax.legend()
+    plt.xlabel('Time')
+    plt.ylabel('Values')
+    plt.title('Smart Agriculture Monitoring')
+    plt.pause(0.1)
+
+while True:
+    try:
+        data = ser.readline().decode().strip()
+        if data:
+            temp, hum, soil = map(float, data.split(','))
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            
+            # Log data
+            with open('agriculture_data.csv', 'a', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow([timestamp, temp, hum, soil])
+            
+            # Update plot
+            x.append(timestamp)
+            temp.append(temp)
+            humidity.append(hum)
+            soil.append(soil)
+            
+            if len(x) > 10:  # Keep last 10 readings
+                x.pop(0)
+                temp.pop(0)
+                humidity.pop(0)
+                soil.pop(0)
+            
+            update_plot()
+            
+    except KeyboardInterrupt:
+        print("Monitoring stopped")
+        break
+    except Exception as e:
+        print(f"Error: {e}")
+
+ser.close()
