@@ -1,0 +1,40 @@
+#include <DHT.h>
+
+#define DHTPIN 2
+#define DHTTYPE DHT11
+#define SOIL_MOISTURE_PIN A0
+#define WATER_PUMP_PIN 3
+
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+  pinMode(WATER_PUMP_PIN, OUTPUT);
+  digitalWrite(WATER_PUMP_PIN, LOW);
+}
+
+void loop() {
+  // Read temperature and humidity
+  float humidity = dht.readHumidity();
+  float temperature = dht.readTemperature();
+  
+  // Read soil moisture (0-1023, 0 = dry)
+  int soilMoisture = analogRead(SOIL_MOISTURE_PIN);
+  
+  // Control water pump based on soil moisture
+  if (soilMoisture > 800) {  // Adjust threshold based on your sensor
+    digitalWrite(WATER_PUMP_PIN, HIGH);
+    delay(2000);  // Water for 2 seconds
+    digitalWrite(WATER_PUMP_PIN, LOW);
+  }
+
+  // Send data to serial port
+  Serial.print(temperature);
+  Serial.print(",");
+  Serial.print(humidity);
+  Serial.print(",");
+  Serial.println(soilMoisture);
+
+  delay(5000);  // Wait 5 seconds between readings
+}
