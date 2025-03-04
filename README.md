@@ -116,3 +116,6 @@ Python: pyserial, matplotlib
 
   ##Conclusion
 Smart Agriculture is transforming farming into a data-driven, sustainable industry. While challenges like cost and accessibility remain, its potential to enhance food security and environmental stewardship makes it critical for the future of agriculture.
+
+https://youtu.be/xcClO527zFE
+
